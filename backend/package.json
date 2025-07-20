@@ -1,0 +1,36 @@
+{
+  "name": "x-clone",
+  "version": "1.0.0",
+  "description": "x-clone backend project",
+  "license": "ISC",
+  "author": "mrcodeboy",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "dev": "ts-node-dev --files src/index.ts index.d.ts",
+    "start": "node index.js",
+    "build": "tsc && copy package.json dist"
+  },
+  "dependencies": {
+    "@arcjet/inspect": "^1.0.0-beta.9",
+    "@arcjet/node": "^1.0.0-beta.9",
+    "@clerk/express": "^1.7.10",
+    "cloudinary": "^2.7.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0",
+    "joi": "^17.13.3",
+    "mongoose": "^8.16.4",
+    "multer": "^2.0.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/dotenv": "^6.1.1",
+    "@types/express": "^5.0.3",
+    "@types/joi": "^17.2.2",
+    "@types/mongoose": "^5.11.96",
+    "@types/multer": "^2.0.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.8.3"
+  }
+}
