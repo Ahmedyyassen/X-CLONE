@@ -18,7 +18,7 @@ type Props = {
   closeConversation: () => void;
   sendMessage: () => void;
   newMessage: string;
-  setNewMessage: React.Dispatch<React.SetStateAction<string>>;
+  setNewMessage: (message: string) => void; 
   selectedConversation: ConversationType;
 };
 

@@ -1,23 +1,23 @@
 import { useApiClient, userApi } from "@/utils/api";
 import { useAuth } from "@clerk/clerk-expo"
 import { useMutation } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import { useEffect } from "react";
 
 const useUserSync = () => {
     const { isSignedIn } = useAuth();
     const api = useApiClient();
 
-    const {mutate, data} = useMutation({
-      mutationFn: ()=> userApi.syncUser(api),
-      onSuccess:(response: AxiosResponse)=> console.log("User synced successfully", response.data.user),
-      onError:(error)=> console.error("User sync failed ", error),
+    const {mutate, data, isPending} = useMutation({
+      mutationFn: async()=> await userApi.syncUser(api),
+      onSuccess:(response: AxiosResponse)=> console.log("User synced successfully", response.data.message),
+      onError:(error:AxiosError)=> console.error("User sync failed ", error.response?.data),
     })
     useEffect(()=>{
-      if (isSignedIn && !data ) {
+      if (isSignedIn && !data && !isPending) {
         mutate();
       }
-    },[data,isSignedIn,mutate])
+    },[data,isSignedIn,mutate, isPending])
 
   return null
 }

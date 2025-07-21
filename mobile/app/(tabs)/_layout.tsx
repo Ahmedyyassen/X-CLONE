@@ -2,9 +2,12 @@ import { Redirect, Tabs } from 'expo-router';
 import { Feather } from "@expo/vector-icons";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '@clerk/clerk-expo';
+import useUserSync from '@/hooks/useUserSync';
 
 const Tabslayout = () => {
+    useUserSync();
     const insets = useSafeAreaInsets();
+    
     const { isSignedIn } = useAuth();
     if (!isSignedIn) return <Redirect href={"/(auth)"} />
 

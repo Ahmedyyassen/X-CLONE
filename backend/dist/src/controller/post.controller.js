@@ -8,17 +8,30 @@ import base64Image from "../utils/base64Image.js";
 import uploadResponseFn from "../utils/cloudinary.js";
 import { deletePostService, likePostService } from "../services/post.service.js";
 export const getPostsHandler = asyncHandler(async (req, res, next) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+    const totalPosts = await PostModel.countDocuments();
     const posts = await PostModel.find()
         .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
         .populate("user", "username firstName lastName profilePicture")
         .populate({
-        path: "comments",
-        populate: {
-            path: "user",
-            select: "username firstName lastName profilePicture"
-        }
+            path: "comments",
+            populate: {
+                path: "user",
+                select: "username firstName lastName profilePicture"
+            }
+        });
+    const hasMore = skip + posts.length < totalPosts;
+    res.status(OK).json({
+        posts,
+        currentPage: page,
+        nextPage: hasMore ? page + 1 : null,
+        hasMore,
+        totalPosts
     });
-    res.status(OK).json({ posts });
 });
 export const getSinglePostHandler = asyncHandler(async (req, res, next) => {
     const { postId } = req.params;

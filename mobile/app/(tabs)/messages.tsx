@@ -5,13 +5,6 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { CONVERSATIONS, ConversationType } from '@/data/conversations'
 import Chat from '@/Components/Chat'
 
-const TRENDING_TOPICS = [
-  { topic: "#ReactNative", tweets: "125K" },
-  { topic: "#TypeScript", tweets: "89K" },
-  { topic: "#WebDevelopment", tweets: "234K" },
-  { topic: "#AI", tweets: "567K" },
-  { topic: "#TeckNews", tweets: "98K" },
-]
 
 
 const MessagesScreen = () => {
@@ -134,8 +127,12 @@ const MessagesScreen = () => {
           <Modal visible={isChateOpen} animationType='slide' presentationStyle='pageSheet'>
             {
               selectedConversation && (
-                <Chat closeConversation={closeConversation} selectedConversation={selectedConversation}
-                  setNewMessage={setNewMessage} newMessage={newMessage} sendMessage={sendMessage}/>
+                <Chat 
+                closeConversation={closeConversation}
+                selectedConversation={selectedConversation}
+                setNewMessage={(message: string)=> setNewMessage(message)}
+                newMessage={newMessage}
+                sendMessage={sendMessage}/>
               )
             }
           </Modal>
