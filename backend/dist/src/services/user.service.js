@@ -1,32 +1,10 @@
-import { clerkClient } from "@clerk/express";
-import { BAD_REQUEST, CONFLICT, NOT_FOUND, OK } from "../constants/http.js";
+import { BAD_REQUEST, NOT_FOUND } from "../constants/http.js";
 import UserModel from "../models/user.model.js";
 import appAssert from "../utils/appAssert.js";
 import NotificationModel from "../models/notification.model.js";
 import { startSession } from "mongoose";
-export const syncUserService = async (clerkId) => {
-    const existedUser = await UserModel.findOne({ clerkId });
-    if (existedUser) {
-        return res.status(OK).json({message:"User has already existed"})
-    }
-    // Fetch user details from Clerk
-    const clerkUser = await clerkClient.users.getUser(clerkId);
-    // Check for emailAddresses and fallback if empty
-    const email = clerkUser.emailAddresses?.[0]?.emailAddress || "";
-    appAssert(email, CONFLICT, "User has no email address associated");
-    const clerkData = {
-        clerkId,
-        email,
-        firstName: clerkUser.firstName || "",
-        lastName: clerkUser.lastName || "",
-        username: clerkUser.emailAddresses[0].emailAddress.split("@")[0],
-        profilePicture: clerkUser.imageUrl || "",
-    };
-    const user = await UserModel.create(clerkData);
-    return {
-        user,
-    };
-};
+
+
 export const followUserService = async ({ userId, targetUserId }) => {
     const targetUser = await UserModel.findById(targetUserId);
     appAssert(targetUser, NOT_FOUND, "This Friend is not found");

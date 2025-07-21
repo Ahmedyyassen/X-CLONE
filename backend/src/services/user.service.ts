@@ -1,47 +1,9 @@
-import { clerkClient } from "@clerk/express";
-import { BAD_REQUEST, CONFLICT, NOT_FOUND } from "../constants/http";
-import UserModel, { UserDocument } from "../models/user.model";
+import { BAD_REQUEST, NOT_FOUND } from "../constants/http";
+import UserModel from "../models/user.model";
 import appAssert from "../utils/appAssert";
 import NotificationModel from "../models/notification.model";
 import { startSession } from "mongoose";
 
-type NewUserInput = {
-    clerkId: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-    username: string;
-    profilePicture: string;
-};
-
-export const syncUserService = async (
-    clerkId: string
-): Promise<{ user: UserDocument }> => {
-    const existedUser = await UserModel.findOne({ clerkId });
-    appAssert(!existedUser, CONFLICT, "User already exist");
-
-    // Fetch user details from Clerk
-    const clerkUser = await clerkClient.users.getUser(clerkId);
-
-    // Check for emailAddresses and fallback if empty
-    const email = clerkUser.emailAddresses?.[0]?.emailAddress || "";
-    appAssert(email, CONFLICT, "User has no email address associated");
-
-    const clerkData: NewUserInput = {
-        clerkId,
-        email,
-        firstName: clerkUser.firstName || "",
-        lastName: clerkUser.lastName || "",
-        username: clerkUser.emailAddresses[0].emailAddress.split("@")[0],
-        profilePicture: clerkUser.imageUrl || "",
-    };
-
-    const user = await UserModel.create(clerkData);
-
-    return {
-        user,
-    };
-};
 
 
 type FollowUserParams={
