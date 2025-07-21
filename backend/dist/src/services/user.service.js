@@ -1,12 +1,14 @@
 import { clerkClient } from "@clerk/express";
-import { BAD_REQUEST, CONFLICT, NOT_FOUND } from "../constants/http.js";
+import { BAD_REQUEST, CONFLICT, NOT_FOUND, OK } from "../constants/http.js";
 import UserModel from "../models/user.model.js";
 import appAssert from "../utils/appAssert.js";
 import NotificationModel from "../models/notification.model.js";
 import { startSession } from "mongoose";
 export const syncUserService = async (clerkId) => {
     const existedUser = await UserModel.findOne({ clerkId });
-    appAssert(!existedUser, CONFLICT, "User already exist");
+    if (existedUser) {
+        return res.status(OK).json({message:"User has already existed"})
+    }
     // Fetch user details from Clerk
     const clerkUser = await clerkClient.users.getUser(clerkId);
     // Check for emailAddresses and fallback if empty
