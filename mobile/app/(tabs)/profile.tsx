@@ -8,16 +8,17 @@ import PostCard from '@/Components/PostCard'
 import usePosts from '@/hooks/usePosts'
 import { Post } from '@/types'
 import CommentModal from '@/Components/CommentModal'
+import useProfile from '@/hooks/useProfile'
+import UpdateProfileModal from '@/Components/UpdateProfileModal'
 
 const ProfileScreen = () => {
-  const { currentUser, refetch:refrechUser } = useCurrentUser();
+  const { currentUser } = useCurrentUser();
 
   const {
       posts,
       isLoading,
       isFetchingNextPage,
       hasNextPage,
-      error,
       refetch,
       checkIsLiked,
       toggleLike,
@@ -29,10 +30,6 @@ const ProfileScreen = () => {
       const selectedPost = selectedPostId ? posts.find((p:Post)=> p._id === selectedPostId ) : null;
         
       const [isRefetching, setIsRefetching] = useState(false);
-      const handlePullToRefresh = async () => {
-          setIsRefetching(true);
-          await refetch();
-          setIsRefetching(false);}
 
       const isThrottled = useRef(false);
       const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -49,6 +46,16 @@ const ProfileScreen = () => {
         }
       }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
+      const { formData,openEditModal,closeEditModal,isEditModalVisible,
+        isUpdateing,refetch:refrechProfile,saveProfile,updateFormFiled } = useProfile();
+
+      const handlePullToRefresh = async () => {
+          setIsRefetching(true);
+          await refrechProfile();
+          await refetch();
+          setIsRefetching(false);
+        }
+
       if (isLoading) {
         return (
           <View className='flex-1 p-8 items-center justify-center'>
@@ -63,7 +70,7 @@ const ProfileScreen = () => {
           <Text className='font-bold text-xl text-gray-900'>
             {currentUser?.firstName} {currentUser?.lastName}
             </Text>
-          <Text className='text-gray-500 text-sm'>3 Posts</Text>
+          <Text className='text-gray-500 text-sm'>{posts.length} Posts</Text>
         </View>
         <SignOutButton />
       </View>
@@ -73,7 +80,8 @@ const ProfileScreen = () => {
           contentContainerStyle={{paddingBottom: 10 }}
           onScroll={handleScroll} scrollEventThrottle={16}
           refreshControl={
-            <RefreshControl refreshing={isRefetching} onRefresh={handlePullToRefresh} tintColor={"#1DA1F2"}/>
+          <RefreshControl refreshing={isRefetching} onRefresh={handlePullToRefresh}
+            colors={["#1DA1F2"]} tintColor={"#1DA1F2"}/>
           }
       >
         {/* BANNER IMAGE */}
@@ -92,7 +100,9 @@ const ProfileScreen = () => {
               className='size-32 rounded-full border-4 border-white'
               resizeMode='cover'
               />
-              <TouchableOpacity className='border border-gray-300 px-6 py-2 rounded-full'>
+              <TouchableOpacity
+              onPress={openEditModal} 
+              className='border border-gray-300 px-6 py-2 rounded-full'>
                 <Text className='font-semibold text-gray-900'>Edit profile</Text>
               </TouchableOpacity>
           </View>
@@ -105,15 +115,11 @@ const ProfileScreen = () => {
                   <Feather name='check-circle' size={16} color={"#1DA1F2"} className='ml-1' />
               </View>
               <Text className='text-gray-500 mb-2'>@{currentUser?.email}</Text>
-              {currentUser?.bio && (
-                <Text className='text-gray-500 mb-3'>{currentUser?.bio}</Text>
-              )}
-              {currentUser?.location && (
+                <Text className='text-gray-500 mb-3'>{currentUser?.bio || "No bio available"}</Text>
                 <View className='flex-row items-center mb-2'>
                   <Feather name='map-pin' size={16} color={"#657786"} />
-                    <Text className='text-gray-500 ml-2'>{currentUser?.location}</Text>
+                    <Text className='text-gray-500 ml-2'>{currentUser?.location || "Location not specified"}</Text>
                 </View>
-              )}
 
               <View className='flex-row items-center mb-3'>
                 <Feather name='calendar' size={16} color={"#657786"} />
@@ -151,14 +157,21 @@ const ProfileScreen = () => {
               />
           ))}
 
-              {isFetchingNextPage && (
+          {isFetchingNextPage && (
               <View className='mt-4 items-center'>
                 <ActivityIndicator size="small" color="#1DA1F2" />
               </View>
             )}
       </ScrollView>
           <CommentModal selectedPost={selectedPost}  onClose={()=> setSelectedPostId(null) } />
-      
+            <UpdateProfileModal 
+            isVisible={isEditModalVisible}
+            onClose={closeEditModal}
+            formData={formData}
+            saveProfile={saveProfile}
+            updateFormFiled={updateFormFiled}
+            isUpdating={isUpdateing}
+            />
     </SafeAreaView>
   )
 }

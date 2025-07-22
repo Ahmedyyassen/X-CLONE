@@ -74,7 +74,7 @@ const CommentModal = ({selectedPost, onClose}: Props) => {
                                             @{selectedPost.user.username}
                                         </Text>
                                 </View>
-                                {comment.user._id === currentUser._id && (
+                                {comment.user._id === currentUser?._id && (
                                     <TouchableOpacity onPress={()=> deleteComment(comment._id) }>
                                         <Feather name='trash' size={20} color={"#657786"} />
                                     </TouchableOpacity>
