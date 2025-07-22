@@ -1,22 +1,22 @@
-import { View, Text, Modal, TouchableOpacity, ScrollView, Image, TextInput, ActivityIndicator } from 'react-native'
+import { View, Text, Modal, TouchableOpacity, ScrollView, Image, TextInput, ActivityIndicator, Alert } from 'react-native'
 import { Post } from '@/types'
 import useCommets from '@/hooks/useCommets'
 import { Feather } from '@expo/vector-icons'
 import useCurrentUser from '@/hooks/useCurrentUser'
 
 type Props={
-    selectedPost: Post | null
+    selectedPost: Post | null | undefined
     onClose: ()=> void
 }
 const CommentModal = ({selectedPost, onClose}: Props) => {
-    const {commentText,setCommentText,createComment,isCreateingComment} = useCommets();
+    const {commentText,setCommentText,createComment,isCreateingComment, deleteComment} = useCommets();
     const { currentUser } = useCurrentUser();
 
-    const isOwnPost = currentUser._id === selectedPost?.user._id;
     const handleClose = () => {
         onClose();
         setCommentText("");
     }
+
   return (
     <Modal visible={!!selectedPost} animationType='slide' presentationStyle='pageSheet'>
         <View className='flex-row justify-between items-center px-4 py-3 border-b border-gray-100'>
@@ -65,13 +65,20 @@ const CommentModal = ({selectedPost, onClose}: Props) => {
                         <Image source={{uri: comment.user.profilePicture || ""}} resizeMode='cover'
                         className='size-10 rounded-full mr-3' />
                         <View className='flex-1'>
-                            <View className='flex-row items-center mb-1'>
-                                    <Text className='font-bold text-gray-900 mr-1'>
-                                        {selectedPost.user.firstName} {selectedPost.user.lastName}
-                                    </Text>
-                                    <Text className='text-gray-500 text-sm ml-1'>
-                                        @{selectedPost.user.username}
-                                    </Text>
+                            <View className='flex-row items-center justify-between mb-1' >
+                                <View className='flex-row items-center '>
+                                        <Text className='font-bold text-gray-900 mr-1'>
+                                            {selectedPost.user.firstName} {selectedPost.user.lastName}
+                                        </Text>
+                                        <Text className='text-gray-500 text-sm ml-1'>
+                                            @{selectedPost.user.username}
+                                        </Text>
+                                </View>
+                                {comment.user._id === currentUser._id && (
+                                    <TouchableOpacity onPress={()=> deleteComment(comment._id) }>
+                                        <Feather name='trash' size={20} color={"#657786"} />
+                                    </TouchableOpacity>
+                                )}
                             </View>
                                     <Text className='text-gray-900 text-base leading-5 mb-2'>{comment.content}</Text>
                         </View>
@@ -81,7 +88,7 @@ const CommentModal = ({selectedPost, onClose}: Props) => {
 
             {/* ADD COMMENT INPUT */}
 
-             <View className='border-b border-gray-100 bg-white p-4'>
+            <View className='border-b border-gray-100 bg-white p-4'>
                 <View className='flex-row'>
                         <Image source={{uri: currentUser?.profilePicture || ""}} resizeMode='cover'
                         className='size-10 rounded-full mr-3' />

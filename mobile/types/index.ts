@@ -44,3 +44,20 @@ export interface Notification {
     };
     createdAt: string
 }
+
+export interface CurrentUser{
+    _id: string;
+    clerkId: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    username:string;
+    profilePicture: string;
+    bannerImage?: string;
+    bio?: string;
+    location: string;
+    followers: string[] ;
+    following: string[]; 
+    createdAt: Date;
+    updatedAt: Date;
+}

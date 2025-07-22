@@ -1,4 +1,5 @@
 import { commentApi, useApiClient } from "@/utils/api"
+import { KEY } from "@/utils/queryKeys";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Alert } from "react-native";
@@ -20,7 +21,7 @@ const useCommets = () => {
         },
         onSuccess:()=>{
             setCommentText("");
-            queryClient.invalidateQueries({queryKey: ["posts"]})
+            queryClient.invalidateQueries({queryKey: [KEY.POST]})
         },
         onError:()=>{
             Alert.alert("Error", "Failed to post comment. Try again.")
@@ -34,11 +35,29 @@ const useCommets = () => {
         }
         createCommentMutation({ postId, content:commentText.trim() })
     }
+
+    const { mutate: deleteCommentMutation } = useMutation({
+        mutationFn: async(commentId: string)=> await commentApi.deleteComment(api, commentId),
+        onSuccess:()=> {
+            queryClient.invalidateQueries({queryKey: [KEY.POST]})
+        },
+        onError:()=>{
+            Alert.alert("Error", "Failed to delete comment. Try again.")
+        }
+    })
+
+    const deleteComment = (commentId: string)=> {
+        Alert.alert("Delete Comment", "Are you sure you want to delete this comment?", [
+            { text: "Cancel", style: "cancel" },
+            { text: "Delete", style: "destructive", onPress: ()=> deleteCommentMutation(commentId) , }
+        ])
+    }
   return{
     commentText,
     setCommentText,
     createComment,
     isCreateingComment: isPending,
+    deleteComment
   }
 }
 

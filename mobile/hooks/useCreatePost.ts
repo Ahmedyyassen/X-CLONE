@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useCallback, useState } from "react"
 import { Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import { KEY } from "@/utils/queryKeys";
 
 type Post={
     content: string;
@@ -45,7 +46,7 @@ const useCreatePost = () => {
         onSuccess:()=>{
             setContent("");
             setSelectedImage(null);
-            queryClient.invalidateQueries({queryKey: ["posts"]});
+            queryClient.invalidateQueries({queryKey: [KEY.POST]});
             Alert.alert("Success", "Post created successfully!");
         },
         onError:()=>{

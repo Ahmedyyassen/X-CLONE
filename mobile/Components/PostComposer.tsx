@@ -1,17 +1,15 @@
 import { View, Text, Image, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native'
-import { useUser } from '@clerk/clerk-expo';
 import useCreatePost from '@/hooks/useCreatePost';
 import { Feather } from '@expo/vector-icons';
 
-const PostComposer = () => {
+const PostComposer = ({image}:{image:string}) => {
     const {content,createPost,isCreating,pickImageFromGallery,removeImage,
         selectedImage,setContent,takePhoto} = useCreatePost();
-        const { user } = useUser();
 
     return (
     <View className='p-4 border-b border-gray-100 bg-white'>
         <View className='flex-row'>
-            <Image source={{uri: user?.imageUrl}} className='size-12 rounded-full mr-3' />
+            <Image source={{uri: image}} className='size-12 rounded-full mr-3' />
             <View className='flex-1'>
                 <TextInput
                 className='text-gray-900 text-lg'

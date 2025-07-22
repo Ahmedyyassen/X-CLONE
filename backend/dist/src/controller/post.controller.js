@@ -48,11 +48,17 @@ export const getSinglePostHandler = asyncHandler(async (req, res, next) => {
     res.status(OK).json({ post });
 });
 export const getUserPostsHandler = asyncHandler(async (req, res, next) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
     const { username } = req.params;
+    const totalPosts = await PostModel.countDocuments();
     const user = await UserModel.findOne({ username });
     appAssert(user, NOT_FOUND, "User not found");
     const posts = await PostModel.find({ user: user._id })
         .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
         .populate("user", "username firstName lastName profilePicture")
         .populate({
         path: "comments",
@@ -61,7 +67,14 @@ export const getUserPostsHandler = asyncHandler(async (req, res, next) => {
             select: "username firstName lastName profilePicture"
         }
     });
-    res.status(OK).json({ posts });
+    const hasMore = skip + posts.length < totalPosts;
+    res.status(OK).json({
+        posts,
+        currentPage: page,
+        nextPage: hasMore ? page + 1 : null,
+        hasMore,
+        totalPosts
+    });
 });
 export const createPostHandler = asyncHandler(async (req, res, next) => {
     const { userId } = getAuth(req);

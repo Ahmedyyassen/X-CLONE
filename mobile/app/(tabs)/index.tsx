@@ -1,9 +1,8 @@
-import { View, Text, ScrollView } from 'react-native'
+import { View, Text } from 'react-native'
 import React from 'react'
 import SignOutButton from '@/Components/SignOutButton'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
-import PostComposer from '@/Components/PostComposer'
 import PostsList from '@/Components/PostsList'
 
 const HomeScreen = () => {
@@ -15,13 +14,7 @@ const HomeScreen = () => {
           <SignOutButton />
       </View>
 
-      <ScrollView className='flex-1'
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={{paddingBottom: 80}}
-      >
-        <PostComposer />
         <PostsList />
-      </ScrollView>
 
     </SafeAreaView>
   )
